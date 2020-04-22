@@ -19,7 +19,7 @@ light = sensors.BH1750()
 temp_press = sensors.BME280()
 warn = led.State()
 
-measuring_interval_sec = 5
+measuring_interval_sec = 60
 accumulate_data_points = 10
 
 max_light_lux = 1000
@@ -33,13 +33,18 @@ temp_array = []
 press_array = []
 
 c = 0
+
+# empty run to initialise sensors
+_ = light.lux()
+_, _ = temp_press.temp_and_pressure()
+
 while True:
     if c == accumulate_data_points:
         c = 0
         
         if not os.path.isfile(outfile):
             with open(outfile, 'w') as f:
-                f.write('Time\tLight Intensity [Lux]\tTemperature [C]\tPressure[Pa]\n')
+                f.write('Time\tLight Intensity [Lux]\tTemperature [C]\tPressure [Pa]\n')
         with open(outfile, 'a') as f:
             a = np.asarray([time_array, light_array, temp_array, press_array])
             np.savetxt(f, np.transpose(a), delimiter='\t', fmt='%s')
